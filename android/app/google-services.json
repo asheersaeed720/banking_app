@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "604778491021",
+    "project_id": "banking-app-af1ed",
+    "storage_bucket": "banking-app-af1ed.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:604778491021:android:f53da650b7a3a3e403c6c4",
+        "android_client_info": {
+          "package_name": "com.softologics.banking_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "604778491021-bam1n7quuhd1i13sghuha6ip0dlpv68b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFX2dKr9-_H0doNjEovGJpVLMGQ-tpSeQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "604778491021-bam1n7quuhd1i13sghuha6ip0dlpv68b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
