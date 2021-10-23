@@ -24,6 +24,6 @@ final List<GetPage<dynamic>> customRoutes = [
   ),
   GetPage(
     name: UserProfileScreen.routeName,
-    page: () => const UserProfileScreen(),
+    page: () => UserProfileScreen(),
   ),
 ];

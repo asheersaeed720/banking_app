@@ -62,13 +62,13 @@ class _LogInScreenState extends State<LogInScreen> {
                           padding: const EdgeInsets.only(top: 6.0),
                           child: TextButton(
                             onPressed: () {},
-                            child: const Text(
+                            child: Text(
                               'Forgot password?',
-                              style: TextStyle(
-                                decoration: TextDecoration.underline,
-                                color: Colors.blue,
-                                fontSize: 14.0,
-                              ),
+                              style: Theme.of(context).textTheme.bodyText1!.copyWith(
+                                    decoration: TextDecoration.underline,
+                                    color: Colors.blue,
+                                    fontSize: 14.0,
+                                  ),
                             ),
                           ),
                         ),
@@ -96,17 +96,29 @@ class _LogInScreenState extends State<LogInScreen> {
                     ),
                     const SizedBox(height: 18.0),
                     Center(
-                      child: InkWell(
-                        onTap: () {
-                          Get.toNamed(SignUpScreen.routeName);
-                        },
-                        child: Text(
-                          'Already have an account?',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyText1!
-                              .copyWith(color: AppTheme.buttonColor),
-                        ),
+                      child: Column(
+                        children: [
+                          Text(
+                            'Already have an account?',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyText1!
+                                .copyWith(color: AppTheme.buttonColor),
+                          ),
+                          InkWell(
+                            onTap: () => Get.toNamed(SignUpScreen.routeName),
+                            child: const Padding(
+                              padding: EdgeInsets.all(8.0),
+                              child: Text(
+                                'Register',
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],

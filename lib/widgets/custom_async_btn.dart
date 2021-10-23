@@ -7,13 +7,17 @@ class CustomAsyncBtn extends StatelessWidget {
     Key? key,
     this.icon,
     required this.btntxt,
+    this.height = 48.0,
     this.btnColor,
+    this.borderRadius = 50,
     required this.onPress,
   }) : super(key: key);
 
   final Icon? icon;
   final String btntxt;
+  final double height;
   final Color? btnColor;
+  final double borderRadius;
   final dynamic onPress;
 
   @override
@@ -40,14 +44,13 @@ class CustomAsyncBtn extends StatelessWidget {
           ? null
           : () async {
               await onPress();
-              await Future.delayed(const Duration(seconds: 1));
             },
       showSuccess: false,
       errorWidget: const Text('error'),
       builder: (context, child, callback, _) {
         return SizedBox(
           width: double.infinity,
-          height: 50.0,
+          height: height,
           child: ElevatedButton(
             child: child,
             style: ButtonStyle(
@@ -55,7 +58,7 @@ class CustomAsyncBtn extends StatelessWidget {
                   MaterialStateProperty.all(btnColor == null ? AppTheme.buttonColor : Colors.blue),
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(50.0),
+                  borderRadius: BorderRadius.circular(borderRadius),
                 ),
               ),
             ),

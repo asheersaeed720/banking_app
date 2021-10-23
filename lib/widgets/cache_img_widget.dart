@@ -31,9 +31,7 @@ class CacheImgWidget extends StatelessWidget {
           height: height,
           imageUrl: imageUrl,
           fit: BoxFit.cover,
-          placeholder: (context, url) => Center(
-            child: Image.asset('assets/images/placeholder_loading.gif'),
-          ),
+          placeholder: (context, url) => Image.asset('assets/images/placeholder_loading.gif'),
           errorWidget: (context, url, error) => Image.asset(noImageAvailable, fit: BoxFit.cover),
         ),
       );

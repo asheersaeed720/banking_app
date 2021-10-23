@@ -4,19 +4,19 @@ import 'dart:io';
 
 import 'package:banking_app/1_src/auth/user_model.dart';
 import 'package:banking_app/1_src/auth/views/auth_screen.dart';
+import 'package:banking_app/1_src/network_manager.dart';
 import 'package:banking_app/utils/custom_snack_bar.dart';
 import 'package:banking_app/utils/db_ref.dart';
 import 'package:banking_app/utils/display_toast_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/src/simple/get_controllers.dart';
 import 'package:get_storage/get_storage.dart';
 
-class AuthController extends GetxController {
+class AuthController extends GetXNetworkManager {
   final GetStorage _getStorage = GetStorage();
 
-  final CollectionReference _userReference = FirebaseFirestore.instance.collection(USERS);
+  final CollectionReference _userReference = FirebaseFirestore.instance.collection(DBRef.users);
 
   bool disableWhileLoad = false;
 
@@ -49,20 +49,19 @@ class AuthController extends GetxController {
       if (userCredential.user != null) {
         disableWhileLoad = true;
         update();
-        _userReference.doc(userCredential.user!.uid).get().then((res) {
-          Get.offAllNamed(AuthScreen.routeName);
-          Map<String, dynamic> data = {
-            "uid": userCredential.user!.uid,
-            "name": res['name'],
-            "email": userModel.email,
-          };
-          GetStorage().write('user', data);
-          GetStorage().write('isLoggedIn', true);
-          currentUserData = getCurrentUser();
-          isLoggedIn = _getStorage.read('isLoggedIn');
-          disableWhileLoad = false;
-          update();
-        });
+        final res = await _userReference.doc(userCredential.user!.uid).get();
+        Get.offAllNamed(AuthScreen.routeName);
+        Map<String, dynamic> data = {
+          "uid": userCredential.user!.uid,
+          "name": res['name'],
+          "email": userModel.email,
+        };
+        GetStorage().write('user', data);
+        GetStorage().write('isLoggedIn', true);
+        currentUserData = getCurrentUser();
+        isLoggedIn = _getStorage.read('isLoggedIn');
+        disableWhileLoad = false;
+        update();
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -121,7 +120,7 @@ class AuthController extends GetxController {
   }
 
   Map getCurrentUser() {
-    Map userData = _getStorage.read('user') == null ? {} : _getStorage.read('user');
+    Map userData = _getStorage.read('user') ?? {};
     if (userData.isNotEmpty) {
       Map user = userData;
       log('$userData', name: 'user');
@@ -142,6 +141,7 @@ class AuthController extends GetxController {
 class AuthBinding extends Bindings {
   @override
   void dependencies() {
+    Get.put(GetXNetworkManager(), permanent: true);
     Get.put(AuthController(), permanent: true);
   }
 }
