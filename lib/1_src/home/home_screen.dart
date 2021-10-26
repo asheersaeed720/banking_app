@@ -1,9 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:banking_app/1_src/auth/auth_controller.dart';
 import 'package:banking_app/1_src/home/add_card_bottom_sheet.dart';
-import 'package:banking_app/1_src/home/bank_card_model.dart';
 import 'package:banking_app/1_src/home/home_controller.dart';
-import 'package:banking_app/1_src/profile/user_profile_screen.dart';
+import 'package:banking_app/1_src/home/models/bank_card_model.dart';
 import 'package:banking_app/utils/custom_app_bar.dart';
 import 'package:banking_app/utils/custom_dialog.dart';
 import 'package:banking_app/widgets/cache_img_widget.dart';
@@ -28,6 +27,13 @@ class _HomeScreenState extends State<HomeScreen> {
   final _homeController = Get.put(HomeController());
 
   @override
+  void initState() {
+    _homeController.determinePosition();
+    _homeController.getNearbyRestaurant();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).backgroundColor,
@@ -42,21 +48,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 builder: (_) {
                   return Card(
                     child: ListTile(
+                      onTap: () {
+                        _homeController.getNearbyRestaurant();
+                      },
                       leading: ClipRRect(
                         borderRadius: BorderRadius.circular(32.0),
                         child: Image.asset('assets/images/dummy_profile.png'),
                       ),
                       title: Text('${_authController.currentUserData['name']}'),
                       subtitle: Text('${_authController.currentUserData['email']}'),
-                      trailing: InkWell(
-                        onTap: () {
-                          Get.toNamed(UserProfileScreen.routeName);
-                        },
-                        child: const Text(
-                          'View',
-                          style: TextStyle(color: Colors.blue),
-                        ),
-                      ),
+                      trailing: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.blue),
                     ),
                   );
                 },

@@ -1,7 +1,7 @@
 import 'dart:developer';
 
-import 'package:banking_app/1_src/home/bank_card_model.dart';
 import 'package:banking_app/1_src/home/home_controller.dart';
+import 'package:banking_app/1_src/home/models/bank_card_model.dart';
 import 'package:banking_app/utils/display_toast_message.dart';
 import 'package:banking_app/utils/input_decoration.dart';
 import 'package:banking_app/widgets/custom_async_btn.dart';

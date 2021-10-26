@@ -137,11 +137,3 @@ class AuthController extends GetXNetworkManager {
     displayToastMessage('Logout');
   }
 }
-
-class AuthBinding extends Bindings {
-  @override
-  void dependencies() {
-    Get.put(GetXNetworkManager(), permanent: true);
-    Get.put(AuthController(), permanent: true);
-  }
-}

@@ -1,9 +1,12 @@
-import 'package:banking_app/1_src/auth/auth_controller.dart';
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:background_location/background_location.dart';
+import 'package:banking_app/1_src/main_binding.dart';
 import 'package:banking_app/utils/app_theme.dart';
 import 'package:banking_app/utils/custom_routes.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:get_storage/get_storage.dart';
@@ -14,6 +17,30 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await GetStorage.init();
+  await AwesomeNotifications().initialize(
+    'resource://drawable/ic_launcher',
+    [
+      NotificationChannel(
+        channelKey: 'nearby_restaurant_channel',
+        channelName: 'Nearby Restaurant Notifications',
+        channelShowBadge: true,
+        playSound: true,
+        importance: NotificationImportance.High,
+      ),
+    ],
+  );
+  await BackgroundLocation.setAndroidNotification(
+    title: "Discount Reminder",
+    message: "Running...",
+    icon: "@drawable/ic_launcher",
+  );
+  BackgroundLocation.startLocationService();
+  BackgroundLocation.getLocationUpdates((location) {
+    print('BACKGROUND${location.latitude}');
+    Geolocator.getPositionStream(distanceFilter: 100).listen((event) {
+      print('GEOLOCATOR ${event.latitude}');
+    });
+  });
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   runApp(const MyApp());
@@ -34,7 +61,7 @@ class MyApp extends StatelessWidget {
           fontFamily: AppTheme.fontName,
           textTheme: AppTheme.textTheme,
         ),
-        initialBinding: AuthBinding(),
+        initialBinding: MainBinding(),
         initialRoute: AuthScreen.routeName,
         getPages: customRoutes,
       );

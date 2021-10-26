@@ -1,15 +1,26 @@
 import 'dart:developer';
 
+import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:banking_app/1_src/api_service.dart';
 import 'package:banking_app/1_src/auth/auth_controller.dart';
-import 'package:banking_app/1_src/home/bank_card_model.dart';
+import 'package:banking_app/1_src/home/models/bank_card_model.dart';
+import 'package:banking_app/1_src/home/models/nearby_place.dart';
 import 'package:banking_app/utils/api.dart';
 import 'package:banking_app/utils/db_ref.dart';
 import 'package:banking_app/utils/display_toast_message.dart';
+import 'package:banking_app/utils/secret.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 
 class HomeController extends GetxController {
   final _authController = Get.find<AuthController>();
+  final ApiService _apiService = ApiService();
+
+  final CollectionReference _userReference = FirebaseFirestore.instance.collection(DBRef.users);
+
+  final CollectionReference _restaurantsReference =
+      FirebaseFirestore.instance.collection(DBRef.restaurants);
 
   final _bankCardReference =
       FirebaseFirestore.instance.collection(DBRef.cards).withConverter<BankCardModel>(
@@ -72,5 +83,95 @@ class HomeController extends GetxController {
     } else {
       displayToastMessage('Network error, try again later');
     }
+  }
+
+  /// Determine the current position of the device.
+  ///
+  /// When the location services are not enabled or permissions
+  /// are denied the `Future` will return an error.
+  Future<void> determinePosition() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        Future.error('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
+    }
+
+    // When we reach here, permissions are granted and we can
+    // continue accessing the position of the device.
+    Position position = await Geolocator.getCurrentPosition();
+    await _userReference.doc(_authController.currentUserData['uid']).update({
+      "latitude": position.latitude,
+      "longitude": position.longitude,
+    });
+    getNearbyRestaurant();
+  }
+
+  void getNearbyRestaurant() async {
+    _userReference.doc(_authController.currentUserData['uid']).get().then((userData) async {
+      var lat = userData.get('latitude');
+      var long = userData.get('longitude');
+      String url =
+          '$googleApi/place/nearbysearch/json?location=$lat%2C$long&radius=1500&type=restaurant&key=${Secret.googleApiKey}';
+      var res = await _apiService.getHttpReq(url);
+      if (res.statusCode == 200) {
+        List<NearbyPlace> nearbyPlace =
+            (res.data['results'] as List).map((e) => NearbyPlace.fromJson(e)).toList();
+        List<String> nearbyPlaceIdFromApi = [];
+        for (var element in nearbyPlace) {
+          nearbyPlaceIdFromApi.add('${element.placeId}');
+        }
+
+        QuerySnapshot querySnapshot = await _restaurantsReference.get();
+
+        List nearbyPlaceIdFromDB = querySnapshot.docs.map((doc) => doc.get('place_id')).toList();
+
+        for (var idFromDB in nearbyPlaceIdFromDB) {
+          if (nearbyPlaceIdFromApi.contains(idFromDB)) {
+            var index = nearbyPlaceIdFromApi.indexOf(idFromDB);
+            await AwesomeNotifications().createNotification(
+              content: NotificationContent(
+                // id: DateTime.now().microsecondsSinceEpoch.remainder(100000),
+                id: 1,
+                channelKey: 'nearby_restaurant_channel',
+                title: '${nearbyPlace[index].name}',
+                body: '30% Discount',
+                notificationLayout: NotificationLayout.Default,
+                createdSource: NotificationSource.Local,
+                displayOnForeground: true,
+                displayOnBackground: true,
+              ),
+            );
+            log('${nearbyPlace[index].name}');
+          } else {
+            log('Not exist');
+          }
+        }
+      }
+    });
   }
 }
