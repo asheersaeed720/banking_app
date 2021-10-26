@@ -10,6 +10,10 @@ final List<GetPage<dynamic>> customRoutes = [
     name: AuthScreen.routeName,
     page: () => AuthScreen(),
   ),
+  // GetPage(
+  //   name: SixAuthScreen.routeName,
+  //   page: () => const SixAuthScreen(),
+  // ),
   GetPage(
     name: LogInScreen.routeName,
     page: () => const LogInScreen(),

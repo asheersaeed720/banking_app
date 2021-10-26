@@ -28,6 +28,7 @@ class AuthScreen extends StatelessWidget {
       _authController.currentUserData = getStorage.read('user') ?? {};
       // _authController.update();
       return const LogInScreen();
+      // return const SixAuthScreen();
     } else {
       return const HomeScreen();
     }
