@@ -10,7 +10,6 @@ import 'package:banking_app/utils/db_ref.dart';
 import 'package:banking_app/utils/display_toast_message.dart';
 import 'package:banking_app/utils/secret.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:get/get.dart';
 
 class HomeController extends GetxController {
@@ -63,7 +62,7 @@ class HomeController extends GetxController {
         expiryDate: expiryDate,
         createdAt: Timestamp.now(),
       ))
-          .then((value) {
+          .then((_) {
         displayToastMessage('Card added');
       }).catchError((e) {
         log('Error $e');
@@ -75,7 +74,7 @@ class HomeController extends GetxController {
 
   Future<void> removeUserCard(String id) async {
     if (_authController.connectionType != 0) {
-      await _bankCardReference.doc(id).delete().then((value) {
+      await _bankCardReference.doc(id).delete().then((_) {
         displayToastMessage('Card Remove');
       }).catchError((e) {
         log('Error $e');
@@ -83,52 +82,6 @@ class HomeController extends GetxController {
     } else {
       displayToastMessage('Network error, try again later');
     }
-  }
-
-  /// Determine the current position of the device.
-  ///
-  /// When the location services are not enabled or permissions
-  /// are denied the `Future` will return an error.
-  Future<void> determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    Position position = await Geolocator.getCurrentPosition();
-    await _userReference.doc(_authController.currentUserData['uid']).update({
-      "latitude": position.latitude,
-      "longitude": position.longitude,
-    });
-    getNearbyRestaurant();
   }
 
   void getNearbyRestaurant() async {

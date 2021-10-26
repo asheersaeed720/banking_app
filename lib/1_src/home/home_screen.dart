@@ -1,8 +1,11 @@
+import 'dart:ui';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:banking_app/1_src/auth/auth_controller.dart';
 import 'package:banking_app/1_src/home/add_card_bottom_sheet.dart';
 import 'package:banking_app/1_src/home/home_controller.dart';
 import 'package:banking_app/1_src/home/models/bank_card_model.dart';
+import 'package:banking_app/1_src/location/location_controller.dart';
 import 'package:banking_app/utils/custom_app_bar.dart';
 import 'package:banking_app/utils/custom_dialog.dart';
 import 'package:banking_app/widgets/cache_img_widget.dart';
@@ -25,12 +28,17 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _authController = Get.find<AuthController>();
   final _homeController = Get.put(HomeController());
+  final _locationController = Get.find<LocationController>();
+
+  // enableGPS() async {
+  //   await prefixLocation.Location().requestService();
+  // }
 
   @override
   void initState() {
-    _homeController.determinePosition();
-    _homeController.getNearbyRestaurant();
     super.initState();
+    // enableGPS();
+    _locationController.onStartLocation();
   }
 
   @override
@@ -49,7 +57,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   return Card(
                     child: ListTile(
                       onTap: () {
-                        _homeController.getNearbyRestaurant();
+                        // _homeController.getNearbyRestaurant();
+                        // Get.to(() => const LocationScreen());
+                        // onStartLocation();
                       },
                       leading: ClipRRect(
                         borderRadius: BorderRadius.circular(32.0),

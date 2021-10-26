@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:background_locator/background_locator.dart';
 import 'package:banking_app/1_src/auth/user_model.dart';
 import 'package:banking_app/1_src/auth/views/auth_screen.dart';
 import 'package:banking_app/1_src/network_manager.dart';
@@ -132,7 +133,9 @@ class AuthController extends GetXNetworkManager {
   signOutUser() async {
     _getStorage.remove('isLoggedIn');
     _getStorage.remove('user');
+    await BackgroundLocator.unRegisterLocationUpdate();
     await FirebaseAuth.instance.signOut();
+    // await BackgroundLocator.isServiceRunning();
     Get.offAndToNamed(AuthScreen.routeName);
     displayToastMessage('Logout');
   }
