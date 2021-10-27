@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 
 void showAlertDialog(context, String title, String message, onPressed) {
   AlertDialog alertDialog = AlertDialog(
-    title: Text('$title'),
-    content: Text('$message'),
+    title: Text(title),
+    content: Text(message),
     actions: [
       TextButton(
         onPressed: () {
           Navigator.of(context).pop();
         },
-        child: Text(
+        child: const Text(
           'No',
           style: TextStyle(color: Colors.black54),
         ),
@@ -17,7 +17,7 @@ void showAlertDialog(context, String title, String message, onPressed) {
       ElevatedButton(
         style: ElevatedButton.styleFrom(primary: Colors.red[600]),
         onPressed: onPressed,
-        child: Text(
+        child: const Text(
           'Yes',
           style: TextStyle(color: Colors.white),
         ),

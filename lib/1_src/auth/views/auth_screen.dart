@@ -26,9 +26,7 @@ class AuthScreen extends StatelessWidget {
       getStorage.remove('user');
       _authController.isLoggedIn = getStorage.read('isLoggedIn') ?? false;
       _authController.currentUserData = getStorage.read('user') ?? {};
-      // _authController.update();
       return const LogInScreen();
-      // return const SixAuthScreen();
     } else {
       return const HomeScreen();
     }

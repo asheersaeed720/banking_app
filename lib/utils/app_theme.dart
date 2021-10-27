@@ -8,7 +8,6 @@ class AppTheme {
   static const Color loginGradientEnd = Color(0xFFf7418c);
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);
-  static const Color buttonColor = Color(0xFF313445);
 
   static const LinearGradient primaryGradient = LinearGradient(
     colors: <Color>[loginGradientStart, loginGradientEnd],

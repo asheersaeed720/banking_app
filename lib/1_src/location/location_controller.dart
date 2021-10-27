@@ -18,7 +18,6 @@ import 'package:banking_app/utils/display_toast_message.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:location/location.dart' as prefixLocation;
 import 'package:permission_handler/permission_handler.dart';
 
 class LocationController extends GetxController {
@@ -65,13 +64,11 @@ class LocationController extends GetxController {
   }
 
   Future<void> _updateNotificationText(dynamic locationData) async {
-    // ignore: unnecessary_null_comparison
     if (locationData == null) {
-      log('location data is $locationData');
       return;
     }
-    log('noob ${locationData.latitude}');
-    Timer.periodic(const Duration(minutes: 30), (_) async {
+    Timer.periodic(const Duration(minutes: 20), (_) async {
+      log('noob ${locationData.latitude}');
       await _userReference.doc(_authController.currentUserData['uid']).update({
         "latitude": locationData.latitude,
         "longitude": locationData.longitude,
@@ -127,7 +124,7 @@ class LocationController extends GetxController {
       case PermissionStatus.restricted:
         final permission = await Permission.locationAlways.request();
         if (permission == PermissionStatus.granted) {
-          await prefixLocation.Location().requestService();
+          // await prefixLocation.Location().requestService();
           return true;
         } else {
           return false;

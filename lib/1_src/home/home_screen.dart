@@ -5,9 +5,12 @@ import 'package:banking_app/1_src/auth/auth_controller.dart';
 import 'package:banking_app/1_src/home/add_card_bottom_sheet.dart';
 import 'package:banking_app/1_src/home/home_controller.dart';
 import 'package:banking_app/1_src/home/models/bank_card_model.dart';
+import 'package:banking_app/1_src/home/models/discount_model.dart';
 import 'package:banking_app/1_src/location/location_controller.dart';
+import 'package:banking_app/1_src/profile/user_profile_screen.dart';
 import 'package:banking_app/utils/custom_app_bar.dart';
 import 'package:banking_app/utils/custom_dialog.dart';
+import 'package:banking_app/utils/display_toast_message.dart';
 import 'package:banking_app/widgets/cache_img_widget.dart';
 import 'package:banking_app/widgets/loading_widget.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -15,6 +18,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:location/location.dart' as prefixLocation;
 
 class HomeScreen extends StatefulWidget {
   static const String routeName = '/home';
@@ -30,15 +34,27 @@ class _HomeScreenState extends State<HomeScreen> {
   final _homeController = Get.put(HomeController());
   final _locationController = Get.find<LocationController>();
 
-  // enableGPS() async {
-  //   await prefixLocation.Location().requestService();
-  // }
+  String selectBankCardType = '';
+
+  doSelectCardType(String type) {
+    selectBankCardType = type;
+  }
+
+  enableGPS() async {
+    bool locationStatus = await prefixLocation.Location().requestService();
+    if (locationStatus) {
+      _locationController.onStartLocation();
+    } else {
+      displayToastMessage('GPS disable');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    // enableGPS();
-    _locationController.onStartLocation();
+    Future.delayed(const Duration(seconds: 2), () {
+      enableGPS();
+    });
   }
 
   @override
@@ -57,9 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   return Card(
                     child: ListTile(
                       onTap: () {
-                        // _homeController.getNearbyRestaurant();
-                        // Get.to(() => const LocationScreen());
-                        // onStartLocation();
+                        Get.toNamed(UserProfileScreen.routeName);
                       },
                       leading: ClipRRect(
                         borderRadius: BorderRadius.circular(32.0),
@@ -79,33 +93,42 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (snapshot.hasData) {
                     List<QueryDocumentSnapshot<BankCardModel>> bankCardsList =
                         snapshot.data!.docs as List<QueryDocumentSnapshot<BankCardModel>>;
-                    return bankCardsList.isEmpty
-                        ? Center(
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const SizedBox(height: 32.0),
-                                Image.asset('assets/icons/debit_cards.png'),
-                                const SizedBox(height: 8.0),
-                                Text('No Card added yet!',
-                                    style: Theme.of(context).textTheme.bodyText1),
-                                const SizedBox(height: 32.0),
-                              ],
-                            ),
-                          )
-                        : CarouselSlider(
-                            options: CarouselOptions(
-                              height: MediaQuery.of(context).size.height * 0.6,
-                              viewportFraction: 0.9,
-                              enableInfiniteScroll: false,
-                            ),
-                            items: [
-                              ...(bankCardsList).map((e) {
-                                return _buildCardViewItem(e);
-                              }).toList()
-                            ],
-                          );
+                    if (bankCardsList.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            const SizedBox(height: 32.0),
+                            Image.asset('assets/icons/debit_cards.png'),
+                            const SizedBox(height: 8.0),
+                            Text('No Card added yet!',
+                                style: Theme.of(context).textTheme.bodyText1),
+                            const SizedBox(height: 32.0),
+                          ],
+                        ),
+                      );
+                    }
+                    // doSelectCardType(bankCardsList[0].data().cardType);
+                    return CarouselSlider(
+                      options: CarouselOptions(
+                        height: MediaQuery.of(context).size.height * 0.5,
+                        viewportFraction: 0.9,
+                        enableInfiniteScroll: false,
+                        onPageChanged: (i, _) {
+                          // ignore: avoid_print
+                          print(bankCardsList[i].data().cardType);
+                          setState(() {
+                            selectBankCardType = bankCardsList[i].data().cardType;
+                          });
+                        },
+                      ),
+                      items: [
+                        ...(bankCardsList).map((e) {
+                          return _buildCardViewItem(e);
+                        }).toList()
+                      ],
+                    );
                   } else if (snapshot.hasError) {
                     return Center(
                       child: Text(
@@ -128,25 +151,48 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: Text('Discounts', style: Theme.of(context).textTheme.headline1),
               ),
               const SizedBox(height: 6.0),
-              Column(
-                children: [
-                  _buildDiscountViewItem(),
-                  _buildDiscountViewItem(),
-                  _buildDiscountViewItem(),
-                  _buildDiscountViewItem(),
-                  _buildDiscountViewItem(),
-                  _buildDiscountViewItem(),
-                  _buildDiscountViewItem(),
-                ],
-              )
-              // ListView.builder(
-              //   padding: const EdgeInsets.symmetric(horizontal: 8.0),
-              //   itemCount: 6,
-              //   shrinkWrap: true,
-              //   itemBuilder: (context, i) {
-              //     return _buildDiscountViewItem();
-              //   },
-              // )
+              StreamBuilder<QuerySnapshot<DiscountModel>>(
+                stream: _homeController.getDiscounts(),
+                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.hasData) {
+                    List<QueryDocumentSnapshot<DiscountModel>> discountList =
+                        snapshot.data!.docs as List<QueryDocumentSnapshot<DiscountModel>>;
+                    return discountList.isEmpty
+                        ? Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(height: 32.0),
+                                Image.asset('assets/icons/debit_cards.png'),
+                                const SizedBox(height: 8.0),
+                                Text('No Card added yet!',
+                                    style: Theme.of(context).textTheme.bodyText1),
+                                const SizedBox(height: 32.0),
+                              ],
+                            ),
+                          )
+                        : Column(
+                            children: [
+                              ...(discountList).map((e) {
+                                if (e.get('card_type') == selectBankCardType) {
+                                  return _buildDiscountViewItem(e);
+                                }
+                                print('${e.get('card_type')} = $selectBankCardType');
+                                return const SizedBox.shrink();
+                              }).toList(),
+                            ],
+                          );
+                  } else if (snapshot.hasError) {
+                    return Center(
+                      child: Text(
+                        "${snapshot.error}",
+                      ),
+                    );
+                  }
+                  return const LoadingWidget();
+                },
+              ),
             ],
           ),
         ),
@@ -177,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 CacheImgWidget(
                   bankCardItem.data().cardImg,
                   width: double.infinity,
-                  height: 158.0,
+                  height: 166.0,
                   borderRadius: 10.0,
                 ),
                 const SizedBox(height: 20),
@@ -233,12 +279,12 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildDiscountViewItem() {
-    return const Card(
+  Widget _buildDiscountViewItem(QueryDocumentSnapshot<DiscountModel> discountItem) {
+    return Card(
       child: ListTile(
-        leading: Icon(Icons.restaurant_outlined),
-        title: Text('Shagufta Restaurant'),
-        subtitle: Text('40% Discount'),
+        leading: const Icon(Icons.restaurant_outlined),
+        title: Text(discountItem.data().discount),
+        subtitle: Text(discountItem.data().restaurantName),
       ),
     );
   }

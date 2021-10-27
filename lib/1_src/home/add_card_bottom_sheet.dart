@@ -87,7 +87,6 @@ void showAddCardBottomModelSheet() {
             const SizedBox(height: 12.0),
             CustomAsyncBtn(
               btntxt: 'Add',
-              borderRadius: 6.0,
               onPress: () async {
                 if (selectedBank.isNotEmpty &&
                     selectedCardType.isNotEmpty &&

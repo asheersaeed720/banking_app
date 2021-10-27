@@ -43,13 +43,13 @@ class AuthController extends GetXNetworkManager {
 
   Future<void> logInUser() async {
     try {
+      disableWhileLoad = true;
+      update();
       UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: userModel.email,
         password: userModel.password,
       );
       if (userCredential.user != null) {
-        disableWhileLoad = true;
-        update();
         final res = await _userReference.doc(userCredential.user!.uid).get();
         Get.offAllNamed(AuthScreen.routeName);
         Map<String, dynamic> data = {
@@ -72,17 +72,27 @@ class AuthController extends GetXNetworkManager {
       } else {
         log(e.code);
       }
+      disableWhileLoad = false;
+      update();
     } on TimeoutException catch (_) {
+      disableWhileLoad = false;
+      update();
       customSnackBar('Error', 'Network error, please try again later');
     } on SocketException catch (_) {
+      disableWhileLoad = false;
+      update();
       customSnackBar('Error', 'Network error, please try again later');
     } catch (e) {
+      disableWhileLoad = false;
+      update();
       log(e.toString());
     }
   }
 
   Future<void> signUpUser() async {
     try {
+      disableWhileLoad = true;
+      update();
       UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: userModel.email,
         password: userModel.password,
@@ -111,11 +121,19 @@ class AuthController extends GetXNetworkManager {
       } else {
         log(e.code);
       }
+      disableWhileLoad = false;
+      update();
     } on TimeoutException catch (_) {
+      disableWhileLoad = false;
+      update();
       customSnackBar('Error', 'Network error, please try again later');
     } on SocketException catch (_) {
+      disableWhileLoad = false;
+      update();
       customSnackBar('Error', 'Network error, please try again later');
     } catch (e) {
+      disableWhileLoad = false;
+      update();
       log(e.toString());
     }
   }
@@ -131,12 +149,17 @@ class AuthController extends GetXNetworkManager {
   }
 
   signOutUser() async {
+    Get.back();
+    disableWhileLoad = true;
+    update();
     _getStorage.remove('isLoggedIn');
     _getStorage.remove('user');
     await BackgroundLocator.unRegisterLocationUpdate();
     await FirebaseAuth.instance.signOut();
     // await BackgroundLocator.isServiceRunning();
     Get.offAndToNamed(AuthScreen.routeName);
+    disableWhileLoad = false;
+    update();
     displayToastMessage('Logout');
   }
 }

@@ -56,15 +56,15 @@ class MyApp extends StatelessWidget {
 }
 
 Map<int, Color> color = {
-  50: const Color.fromRGBO(201, 93, 251, .1),
-  100: const Color.fromRGBO(201, 93, 251, .2),
-  200: const Color.fromRGBO(201, 93, 251, .3),
-  300: const Color.fromRGBO(201, 93, 251, .4),
-  400: const Color.fromRGBO(201, 93, 251, .5),
-  500: const Color.fromRGBO(201, 93, 251, .6),
-  600: const Color.fromRGBO(201, 93, 251, .7),
-  700: const Color.fromRGBO(201, 93, 251, .8),
-  800: const Color.fromRGBO(201, 93, 251, .9),
+  50: const Color.fromRGBO(49, 52, 69, .1),
+  100: const Color.fromRGBO(49, 52, 69, .2),
+  200: const Color.fromRGBO(49, 52, 69, .3),
+  300: const Color.fromRGBO(49, 52, 69, .4),
+  400: const Color.fromRGBO(49, 52, 69, .5),
+  500: const Color.fromRGBO(49, 52, 69, .6),
+  600: const Color.fromRGBO(49, 52, 69, .7),
+  700: const Color.fromRGBO(49, 52, 69, .8),
+  800: const Color.fromRGBO(49, 52, 69, .9),
 };
 
-MaterialColor customPrimaryColor = MaterialColor(0xFFC95DFB, color);
+MaterialColor customPrimaryColor = MaterialColor(0xFF313445, color);

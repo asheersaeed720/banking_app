@@ -1,5 +1,4 @@
 import 'package:async_button_builder/async_button_builder.dart';
-import 'package:banking_app/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 
 class CustomAsyncBtn extends StatelessWidget {
@@ -9,7 +8,7 @@ class CustomAsyncBtn extends StatelessWidget {
     required this.btntxt,
     this.height = 48.0,
     this.btnColor,
-    this.borderRadius = 50,
+    this.borderRadius = 6.0,
     required this.onPress,
   }) : super(key: key);
 
@@ -39,7 +38,6 @@ class CustomAsyncBtn extends StatelessWidget {
                 Text(btntxt, style: Theme.of(context).textTheme.bodyText1),
               ],
             ),
-      // ignore: unnecessary_null_comparison
       onPressed: onPress == null
           ? null
           : () async {
@@ -55,7 +53,7 @@ class CustomAsyncBtn extends StatelessWidget {
             child: child,
             style: ButtonStyle(
               backgroundColor:
-                  MaterialStateProperty.all(btnColor == null ? AppTheme.buttonColor : Colors.blue),
+                  MaterialStateProperty.all(btnColor ?? Theme.of(context).primaryColor),
               shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                 RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(borderRadius),

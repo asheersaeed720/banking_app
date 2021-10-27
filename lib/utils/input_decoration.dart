@@ -5,24 +5,17 @@ InputDecoration buildTextFieldInputDecoration(
   required String labelText,
   required Widget preffixIcon,
 }) {
-  // return InputDecoration(
-  //   border: const UnderlineInputBorder(
-  //     borderSide: BorderSide(color: Colors.grey),
-  //   ),
-  //   labelText: labelText,
-  //   isDense: true,
-  //   labelStyle: Theme.of(context).textTheme.headline2!.copyWith(fontSize: 13.0),
-  //   prefixIcon: preffixIcon,
-  // );
   return InputDecoration(
+    border: OutlineInputBorder(
+      borderSide: BorderSide(
+        color: Colors.grey.shade400,
+        width: 1.0,
+      ),
+    ),
     labelText: labelText,
-    contentPadding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 15),
+    labelStyle: const TextStyle(color: Colors.black87),
     isDense: true,
-    counterText: '',
-    focusedBorder:
-        OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).primaryColor)),
-    errorStyle: const TextStyle(height: 1.5),
-    border: InputBorder.none,
+    prefixIcon: preffixIcon,
   );
 }
 
@@ -32,12 +25,15 @@ InputDecoration buildPasswordInputDecoration(
   required Widget suffixIcon,
 }) {
   return InputDecoration(
-    border: const UnderlineInputBorder(
-      borderSide: BorderSide(color: Colors.grey),
+    border: OutlineInputBorder(
+      borderSide: BorderSide(
+        color: Colors.grey.shade400,
+        width: 1.0,
+      ),
     ),
     labelText: labelText,
     isDense: true,
-    labelStyle: Theme.of(context).textTheme.headline2!.copyWith(fontSize: 13.0),
+    labelStyle: const TextStyle(color: Colors.black87),
     prefixIcon: const Icon(Icons.lock),
     suffixIcon: suffixIcon,
   );

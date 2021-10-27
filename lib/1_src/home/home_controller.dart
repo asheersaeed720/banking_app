@@ -4,6 +4,7 @@ import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:banking_app/1_src/api_service.dart';
 import 'package:banking_app/1_src/auth/auth_controller.dart';
 import 'package:banking_app/1_src/home/models/bank_card_model.dart';
+import 'package:banking_app/1_src/home/models/discount_model.dart';
 import 'package:banking_app/1_src/home/models/nearby_place.dart';
 import 'package:banking_app/utils/api.dart';
 import 'package:banking_app/utils/db_ref.dart';
@@ -32,6 +33,16 @@ class HomeController extends GetxController {
         .where("uid", isEqualTo: _authController.currentUserData['uid'])
         .orderBy('created_at', descending: true)
         .snapshots();
+  }
+
+  final _discountsRef =
+      FirebaseFirestore.instance.collection(DBRef.discounts).withConverter<DiscountModel>(
+            fromFirestore: (snapshot, _) => DiscountModel.fromJson(snapshot.data()!),
+            toFirestore: (trip, _) => trip.toJson(),
+          );
+
+  Stream<QuerySnapshot<DiscountModel>> getDiscounts() {
+    return _discountsRef.snapshots();
   }
 
   Future<void> addUserCard({
@@ -105,11 +116,11 @@ class HomeController extends GetxController {
 
         for (var idFromDB in nearbyPlaceIdFromDB) {
           if (nearbyPlaceIdFromApi.contains(idFromDB)) {
-            var index = nearbyPlaceIdFromApi.indexOf(idFromDB);
+            int index = nearbyPlaceIdFromApi.indexOf(idFromDB);
             await AwesomeNotifications().createNotification(
               content: NotificationContent(
                 // id: DateTime.now().microsecondsSinceEpoch.remainder(100000),
-                id: 1,
+                id: index,
                 channelKey: 'nearby_restaurant_channel',
                 title: '${nearbyPlace[index].name}',
                 body: '30% Discount',
