@@ -9,7 +9,7 @@ class ApiService {
     try {
       return await Dio().get(url);
     } on SocketException catch (_) {
-      displayToastMessage('Network errro, try again later');
+      displayToastMessage('Network error, try again later');
       rethrow;
     } catch (e) {
       log('$e', name: 'getResponse');

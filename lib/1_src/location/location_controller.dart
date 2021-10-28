@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:developer';
 import 'dart:isolate';
+import 'dart:math' show cos, sqrt, asin;
 import 'dart:ui';
 
 import 'package:background_locator/background_locator.dart';
@@ -63,24 +64,52 @@ class LocationController extends GetxController {
     update();
   }
 
+  double calculateDistance(double lat1, double lon1, double lat2, double lon2) {
+    var p = 0.017453292519943295;
+    var c = cos;
+    var a =
+        0.5 - c((lat2 - lat1) * p) / 2 + c(lat1 * p) * c(lat2 * p) * (1 - c((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a));
+  }
+
   Future<void> _updateNotificationText(dynamic locationData) async {
     if (locationData == null) {
       return;
     }
-    Timer.periodic(const Duration(minutes: 20), (_) async {
-      log('noob ${locationData.latitude}');
-      await _userReference.doc(_authController.currentUserData['uid']).update({
-        "latitude": locationData.latitude,
-        "longitude": locationData.longitude,
-      });
-      _homeController.getNearbyRestaurant();
-    });
 
-    await BackgroundLocator.updateNotificationText(
-      title: "Discount Reminder",
-      msg: "${DateTime.now()}",
-      bigMsg: "Finding discounts in nearby restaurant...",
-    );
+    if (_authController.connectionType != 0) {
+      var userData = await _userReference.doc(_authController.currentUserData['uid']).get();
+      var lat = userData.get('latitude');
+      var lng = userData.get('longitude');
+
+      // log('Current Latlng $lat, $lng');
+      // log('Upcoming Latlng ${locationData.latitude}, ${locationData.longitude}');
+
+      if ((lat != locationData.latitude) && (lng != locationData.longitude)) {
+        double totalDistance =
+            calculateDistance(lat, lng, locationData.latitude, locationData.longitude);
+
+        if (totalDistance >= 1) {
+          log('distance $totalDistance');
+          await _userReference.doc(_authController.currentUserData['uid']).update({
+            "latitude": locationData.latitude,
+            "longitude": locationData.longitude,
+          });
+          _homeController.getNearbyRestaurant();
+
+          await BackgroundLocator.updateNotificationText(
+            title: "Discount Reminder",
+            // msg: "${DateTime.now()}",
+            bigMsg: "Finding discounts in nearby restaurant...",
+          );
+        } else {
+          log('else distance $totalDistance');
+        }
+      } else {
+        log('Same Location');
+        print('saaaaaaaaaaaaaam Location');
+      }
+    }
   }
 
   Future<void> initPlatformState() async {
@@ -124,7 +153,6 @@ class LocationController extends GetxController {
       case PermissionStatus.restricted:
         final permission = await Permission.locationAlways.request();
         if (permission == PermissionStatus.granted) {
-          // await prefixLocation.Location().requestService();
           return true;
         } else {
           return false;
@@ -143,12 +171,12 @@ class LocationController extends GetxController {
       initCallback: LocationCallbackHandler.initCallback,
       initDataCallback: data,
       disposeCallback: LocationCallbackHandler.disposeCallback,
-      iosSettings: const IOSSettings(accuracy: LocationAccuracy.NAVIGATION, distanceFilter: 0),
+      iosSettings: const IOSSettings(accuracy: LocationAccuracy.NAVIGATION, distanceFilter: 0.0),
       autoStop: false,
       androidSettings: const AndroidSettings(
         accuracy: LocationAccuracy.NAVIGATION,
         interval: 5,
-        distanceFilter: 0,
+        distanceFilter: 0.0,
         client: LocationClient.google,
         androidNotificationSettings: AndroidNotificationSettings(
           notificationChannelName: 'Location tracking',
