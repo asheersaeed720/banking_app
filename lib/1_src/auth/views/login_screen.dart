@@ -96,7 +96,7 @@ class _LogInScreenState extends State<LogInScreen> {
                       Row(
                         children: [
                           Text(
-                            'Already have an account?',
+                            'Don\'t have an account?',
                             style: Theme.of(context).textTheme.bodyText1,
                           ),
                           InkWell(
