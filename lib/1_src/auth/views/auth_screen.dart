@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:banking_app/1_src/auth/auth_controller.dart';
 import 'package:banking_app/1_src/auth/views/login_screen.dart';
-import 'package:banking_app/1_src/home/home_screen.dart';
+import 'package:banking_app/1_src/home/home_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -28,7 +28,8 @@ class AuthScreen extends StatelessWidget {
       _authController.currentUserData = getStorage.read('user') ?? {};
       return const LogInScreen();
     } else {
-      return const HomeScreen();
+      // return const HomeScreen();
+      return const HomePage();
     }
   }
 }

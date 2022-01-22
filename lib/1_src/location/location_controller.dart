@@ -109,6 +109,7 @@ class LocationController extends GetxController {
         log('Same Location');
         print('saaaaaaaaaaaaaam Location');
       }
+      displayToastMessage('Location');
     }
   }
 
